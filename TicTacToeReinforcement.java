@@ -44,6 +44,7 @@ public class TicTacToeReinforcement {
 
 	public static void main(String[] args) {
 
+		
 		ArrayList<int[]> compGameLog = new ArrayList<int[]>();
 		ArrayList<int[]> compActions = new ArrayList<int[]>();
 		ArrayList<int[]> userGameLog = new ArrayList<int[]>();
@@ -54,10 +55,15 @@ public class TicTacToeReinforcement {
 		ArrayList<int[]> smartActions = new ArrayList<int[]>();
 
 
+		//DECLARATION OF THE GAME
+		int BOARD_WIDTH = 3; //for convenience sake, keep them equal.
+		int stateLength = BOARD_WIDTH*BOARD_WIDTH;
+		int WIN_REQUIREMENT = 3; //Game Checker isn't generalized YET, so use three.
+		
 		//DECLARATION OF NEURAL NETWORK
 		int hiddenLayer = 10;
 		double learningRate = 0.1;	
-		TTTNNBrain AI = new TTTNNBrain(9,9,hiddenLayer,learningRate);
+		TTTNNBrain AI = new TTTNNBrain(stateLength,stateLength,hiddenLayer,learningRate);
 		
 		int generations = 100;
 		int gamesPerGeneration = 10;
@@ -70,8 +76,11 @@ public class TicTacToeReinforcement {
 				double computerMoveFirst = Math.random();
 
 				//HERE IS A STATE. 1 is computer, -1 is human.
-				double[] state = {0,0,0,0,0,0,0,0,0};
-
+				double[] state = new double[stateLength];
+				for (int i = 0; i<stateLength;i++) {
+					state[i]=0;
+				}
+					
 				if (computerMoveFirst>0.5) {
 					compGameLog.add(tttfunc.saveState(state));
 				}
@@ -79,6 +88,7 @@ public class TicTacToeReinforcement {
 					userGameLog.add(tttfunc.saveState(state));
 				}
 				int gameResult = 5;
+				tttfunc.gameResult(state,BOARD_WIDTH,WIN_REQUIREMENT);
 
 				//GAME
 				if(computerMoveFirst>0.5) {
@@ -87,7 +97,7 @@ public class TicTacToeReinforcement {
 						userGameLog.add(tttfunc.saveState(state));
 						compActions.add(tttfunc.actionCommitted(userGameLog.get(userGameLog.size()-1),compGameLog.get(compGameLog.size()-1)));
 						tttfunc.printBoard(state);
-						gameResult = tttfunc.gameResult(state);
+						gameResult = tttfunc.gameResult(state,BOARD_WIDTH,WIN_REQUIREMENT);
 
 						if (gameResult == 5) {
 							boolean madeMove = false;
@@ -103,7 +113,7 @@ public class TicTacToeReinforcement {
 							compGameLog.add(tttfunc.saveState(state));
 							userActions.add(tttfunc.actionCommitted(compGameLog.get(compGameLog.size()-1),userGameLog.get(userGameLog.size()-1)));
 							tttfunc.printBoard(state);
-							gameResult = tttfunc.gameResult(state);
+							gameResult = tttfunc.gameResult(state,BOARD_WIDTH,WIN_REQUIREMENT);
 						}
 					}
 				}
@@ -125,12 +135,12 @@ public class TicTacToeReinforcement {
 							compGameLog.add(tttfunc.saveState(state));
 							userActions.add(tttfunc.actionCommitted(compGameLog.get(compGameLog.size()-1),userGameLog.get(userGameLog.size()-1)));
 							tttfunc.printBoard(state);
-							gameResult = tttfunc.gameResult(state);
+							gameResult = tttfunc.gameResult(state,BOARD_WIDTH,WIN_REQUIREMENT);
 							tttfunc.computerMove(state,AI);
 							userGameLog.add(tttfunc.saveState(state));
 							compActions.add(tttfunc.actionCommitted(userGameLog.get(userGameLog.size()-1),compGameLog.get(compGameLog.size()-1)));
 							tttfunc.printBoard(state);
-							gameResult = tttfunc.gameResult(state);
+							gameResult = tttfunc.gameResult(state,BOARD_WIDTH,WIN_REQUIREMENT);
 						}
 					}
 				}
