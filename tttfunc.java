@@ -1,9 +1,10 @@
 package NEURAL_NETWORKS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class tttfunc {
-	
+
 	public static void printBoard(double[] st) {
 		String[] XO_REPRESENT = new String[st.length];
 		for (int i = 0;i<st.length;i++) {
@@ -19,9 +20,61 @@ public class tttfunc {
 		System.out.println("  "+XO_REPRESENT[6]+"  |  " + XO_REPRESENT[7] + "  |  " + XO_REPRESENT[8]);
 
 	}
-	
-	public static int gameResult(double[] st) {
-		int[][] winningStates = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
+
+	public static int[][] winningStates(double[] st, int boardWidth, int inARow, boolean print) {
+		ArrayList <int[]> winStates = new ArrayList<int[]>();
+		//horizontal = can confirm
+		for (int i = 0;i<boardWidth*boardWidth;i++) {
+			if (i%boardWidth<=(boardWidth-inARow)) {
+				int[] newState = new int[inARow];
+				for (int j = 0;j<inARow;j++) {
+					newState[j]= i+j;
+				}
+				winStates.add(newState);
+			}
+		}
+		//vertical = can confirm
+		for (int i = 0;i<boardWidth*boardWidth;i++) {
+			if (i/boardWidth<=(boardWidth-inARow)) {
+				int[] newState = new int[inARow];
+				for (int j = 0;j<inARow;j++) {
+					newState[j]= i+(j*boardWidth);
+				}
+				winStates.add(newState);
+			}
+		}
+		//diagonal from RB -> LT = can confirm
+		for (int i = st.length-1;i>=0;i--) {
+			if (i%boardWidth>=inARow-1&&i/boardWidth>=inARow-1) {
+				int[] newState = new int[inARow];
+				for (int j = 0;j<inARow;j++) {
+					newState[j]= i-j-(j*boardWidth);
+				}
+				winStates.add(newState);
+			}
+		}
+		//diagonal from LB -> RT
+		for (int i = st.length-1;i>=0;i--) {
+			if (i%boardWidth<=boardWidth-inARow&&i/boardWidth>=inARow-1) {
+				int[] newState = new int[inARow];
+				for (int j = 0;j<inARow;j++) {
+					newState[j]= i+j-(j*boardWidth);
+				}
+				winStates.add(newState);
+			}
+		}
+		int[][] states = new int[winStates.size()][inARow];
+		for (int i = 0;i<winStates.size();i++) {
+			states[i] = winStates.get(i);
+			if(print) {
+				System.out.println(Arrays.toString(states[i]));
+			}
+		}
+		return states;
+	}
+
+	public static int gameResult(double[] st,int boardWidth, int inARow) {
+		int[][] winningStates = winningStates(st,boardWidth,inARow,false);
 		for (int i = 0;i<winningStates.length;i++) {
 			if (st[winningStates[i][0]] != 0 && st[winningStates[i][0]] == st[winningStates[i][1]] && st[winningStates[i][1]] == st[winningStates[i][2]]) {
 				return (int) st[winningStates[i][0]];
@@ -30,7 +83,7 @@ public class tttfunc {
 		if (isBoardFilled(st)) return 0;
 		return 5;
 	}
-	
+
 	public static boolean isLegal(double[] st, int index) {
 		if (st[index] == 0) return true;
 		return false;
@@ -98,7 +151,7 @@ public class tttfunc {
 		}
 		return st;
 	}
-	
+
 	public static int[] saveState(double[] st) {
 		int[] oldState = new int[st.length];
 		for (int i = 0;i<st.length;i++) {
